@@ -1,0 +1,245 @@
+@import 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital@0;1&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: 'Lato', sans-serif;
+}
+
+.container{
+    height: 100vh;
+    border: 3px solid #2a73f4;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    position: relative;
+}
+#map {
+    height: 100%;
+    z-index: 2;
+}
+
+.title, .show-me, .active, .what, .chat, .what-info{
+    z-index: 4;
+    position: absolute;
+}
+.title{
+    padding: .5rem 1rem;
+    font-size: 1.5rem;
+    color: #fff;
+    background-color: rgb(76, 192, 76);
+    border-radius: 3px;
+    top: 1rem;
+    left: 1rem;
+}
+.sub-title{
+    color: #2a73f4;
+    font-size: .9rem;
+    font-weight: bold;
+    float: right;
+}
+.active, .show-me, .what{
+    padding: .4rem .6rem;
+    color: #fff;
+    background-color: rgb(76, 192, 76);
+    border-radius: 3px;
+    cursor: pointer;
+}
+.active{
+    top: 1rem;
+    right: 1rem; 
+}
+.show-me{
+    width: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 3.5rem;
+    right: 1rem;
+}
+.what{
+    width: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 6rem;
+    right: 1rem;
+}
+
+.chat{
+    width: 400px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: .3s;
+    bottom: 1rem;
+    left: 1rem;
+}
+.cross-chat{
+    padding: .25rem .7rem;
+    color:rgb(76, 192, 76);
+    background-color: #fff;
+    border: 2px solid rgb(76, 192, 76);
+    border-bottom: none;
+    border-top-right-radius: 7px;
+    position: absolute;
+    right: 0;
+    top: -1.6rem;
+    cursor: pointer;
+}
+.message{
+    max-height: 400px;
+    padding: .5rem .75rem;
+    border: 2.5px solid rgb(76, 192, 76);
+    border-bottom: none;
+    border-top-left-radius: 7px;
+    overflow-y: scroll;
+}
+.ind-message{
+    padding: .6rem 0;
+    display: flex;
+    align-items: center;
+}
+.ind-message i{
+    color: #2a73f4;
+}
+.msg{
+    margin: 0 .5rem;
+}
+.msg-date{
+    margin: .5rem 0;
+    color: #797979;
+    font-size: .8rem;
+    font-style: italic;
+    text-align: center;
+}
+.time{
+    color: #797979;
+    font-size: .7rem;
+    font-style: italic;
+}
+.right-side{
+    flex-direction: row-reverse;
+}
+.right-side i{
+    transform: rotate(180deg);
+}
+.inp{
+    display: flex;
+}
+.inp input, .inp button{
+    height: 40px;
+    border: 2.5px solid rgb(76, 192, 76);
+    outline: none;
+}
+.inp input{
+    padding: 0 .5rem;
+    width: 90%;
+    border-bottom-left-radius: 7px;
+}
+.inp button{
+    width: 10%;
+    background: #fff;
+    border-left: none;
+    border-bottom-right-radius: 7px;
+    cursor: pointer;
+    color: rgb(76, 192, 76);
+}
+
+.what-info{
+    width: 200px;
+    height: 125px;
+    padding: 0 .5rem;
+    color: #fff;
+    background-color: rgb(76, 192, 76);
+    border: 2px solid #fff;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 3.5rem;
+    right: 3.5rem;
+}
+
+.error{
+    padding: 1rem 1.5rem;
+    max-width: 500px;
+    font-style: italic;
+    color: #fff;
+    background-color: rgb(255, 101, 101);
+    border: 2px solid rgb(76, 192, 76);
+    border-radius: 3px;
+    transition: .3s;
+    z-index: 5;
+    position: absolute;
+    bottom: 1rem;
+    right: .5rem;
+}
+
+.anim{
+    background: linear-gradient(-45deg, rgb(76,192,76), #2a73f4, rgb(0, 255, 0), #83aaee);
+    background-size: 400% 400%;
+    animation: gradient 7s ease infinite;
+}
+@keyframes gradient{
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(101, 165, 101);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(76, 192, 76);
+}
+
+@media (max-width: 600px){
+    .chat{
+        width: 350px;
+    }
+}
+@media (max-width: 500px){
+    .chat{
+        width: 300px;
+    }
+    .error{
+        max-width: 300px;
+    }
+}
+@media (max-width: 450px){
+    .title, .chat{
+        left: .5rem;
+    }
+    .active, .show-me, .what{
+        right: .5rem;
+    }
+}
+@media (max-width: 400px){
+    .chat{
+        width: 275px;
+    }
+}
+@media (max-width: 360px){
+    .chat{
+        width: 250px;
+    }
+    .message{
+        padding: .5rem;
+    }
+}
