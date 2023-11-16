@@ -43,7 +43,6 @@
             navigator.geolocation.getCurrentPosition(
                 position=> {
                     userCoords= [ position.coords.latitude.toFixed(4), position.coords.longitude.toFixed(4) ]
-                    console.log([ position.coords.latitude, position.coords.longitude ])
                 },
                 ()=> {
                     errorMsg="Sorry! your location couldn't be tracked. Your location will be set to a random location. Please use different device / browser for exact location.";
@@ -65,7 +64,6 @@
         }
     }
 
-    let ii=0;
     // send message
     const sendMessage=()=>{
         if(msg && userCoords.length>0){
@@ -79,11 +77,6 @@
                 date: `${currentDate.getFullYear()}/${currentDate.getMonth()+1}/${currentDate.getDate()}`,
                 coords: userCoords
             };
-
-            ii++;
-
-            // data.msg=99;
-            // data.coords=['29.1221','46.1221'];
     
             set(newChatRef, data);
 
@@ -201,12 +194,12 @@
     const handleShowActiveUsers=()=>{
         showActiveUsers=!showActiveUsers;
 
-        if(showActiveUsers){
+        if(showActiveUsers && activeUsersCoords.length>0){
             map.removeLayer(activeMarkerGroup);
             activeMarkerGroup=leaflet.layerGroup().addTo(map);
 
-            activeUsers.forEach(elem=>{
-                leaflet.marker(elem.uid.split("*"), {icon: activeMarker}).addTo(activeMarkerGroup)
+            activeUsersCoords.forEach(elem=>{
+                leaflet.marker(elem.split("*"), {icon: activeMarker}).addTo(activeMarkerGroup)
             })
         }
         else{
@@ -235,7 +228,7 @@
 
     // handle message dates
     const handleMessageDate=date=>{
-        let day=date[0]+date[1];
+        let day=date.substring(5,date.length);
 
         if(days.includes(day)) return false;
         else{
