@@ -22,7 +22,7 @@ body{
     z-index: 2;
 }
 
-.title, .show-me, .active, .what, .chat, .what-info{
+.title, .show-me, .active, .show-active, .what, .chat, .what-info{
     z-index: 4;
     position: absolute;
 }
@@ -41,7 +41,7 @@ body{
     font-weight: bold;
     float: right;
 }
-.active, .show-me, .what{
+.active, .show-active, .show-me, .what{
     padding: .4rem .6rem;
     color: #fff;
     background-color: rgb(76, 192, 76);
@@ -52,12 +52,16 @@ body{
     top: 1rem;
     right: 1rem; 
 }
+.show-active{
+    top: 3.5rem;
+    right: 1rem;
+}
 .show-me{
     width: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
-    top: 3.5rem;
+    top: 6rem;
     right: 1rem;
 }
 .what{
@@ -65,7 +69,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    top: 6rem;
+    top: 8.5rem;
     right: 1rem;
 }
 
@@ -242,4 +246,23 @@ body{
     .message{
         padding: .5rem;
     }
+}
+
+.default-marker-outer, .active-marker-outer{
+    height: 30px;
+    width: 30px;
+    background-color: rgba(0, 0, 0, .4);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 193;
+}
+.default-marker, .active-marker{
+    width: 20px;
+    height: 20px;
+    background-color: #2a73f4;
+    border: 2px solid rgb(76, 192, 76);
+    border-radius: 50%;
+    z-index: 193;
 }

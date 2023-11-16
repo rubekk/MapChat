@@ -10,25 +10,29 @@
 
     let leaflet,
         map,
-        markerGroup,
+        chatMarkerGroup,
+        activeMarkerGroup,
         myLocation,
-        showMyLocation=false,
-        showWhatInfo=false,
-        mapLoaded=false,
-        increasedUsers=false,
-        showMsg=true,
-        showError=false,
+        msgDiv, 
+        defaultMarker,
+        activeMarker,
+        msg="",
         errorMsg="",
         userId="",
-        activeUsers=0,
-        userCoords=[],
+        activeUsers=0;
+    let showMyLocation=false,
+        showWhatInfo=false,
+        showActiveUsers=false,
+        mapLoaded=false,
+        increasedUsers=false,
+        showMsg=false,
+        showError=false;
+    let userCoords=[],
         activeUsersCoords=[],
         defaultViewCoords=['27.665', '85.331'],
         markers=[],
         chatData=[],
-        days=[],
-        msg="",
-        msgDiv;
+        days=[];
     
     // get user location
     const getLocation=()=>{
@@ -68,13 +72,6 @@
                 date: `${currentDate.getFullYear()}/${currentDate.getMonth()+1}/${currentDate.getDate()}`,
                 coords: userCoords
             };
-
-            // data={
-            //     msg: "this is a great message",
-            //     time: "09:00:00",
-            //     date: "15/10/2023",
-            //     coords: [27.555, 28.555]
-            // }
     
             set(newChatRef, data);
 
@@ -83,6 +80,7 @@
         else if(userCoords.length==0) getLocation();
     }
 
+    // increase active users
     const increaseActiveUsers=()=>{  
         if(userCoords.length==0) getLocation();
 
@@ -151,8 +149,8 @@
 
     // show markers
     const showMarkers=(viewCoords=defaultViewCoords, index=-1)=>{
-        map.removeLayer(markerGroup);
-        markerGroup=leaflet.layerGroup().addTo(map);
+        map.removeLayer(chatMarkerGroup);
+        chatMarkerGroup=leaflet.layerGroup().addTo(map);
 
         if(index>=markers.length) index=markers.length-1;
         else if(index==-1 && markers.length>0 && chatData.length>0){
@@ -164,15 +162,15 @@
         markers.forEach((elem,i)=>{
             if(index==i){
                 
-                leaflet.marker(elem.coords).addTo(markerGroup).bindPopup(leaflet.popup().setContent(
+                leaflet.marker(elem.coords, {icon: defaultMarker}).addTo(chatMarkerGroup).bindPopup(leaflet.popup().setContent(
                     `<div>
                         <p style="font-style: italic; font-size: .8rem"> ${elem.msg} </p>
                         <p style="margin: -17px 0; float: right; font-style: italic; font-size: .6rem; color: #797979;"> ${elem.time} </p>
                     </div>`
-                )).openPopup();
-            }
+                    )).openPopup();
+                }
             else{
-                leaflet.marker(elem.coords).addTo(markerGroup).bindPopup(leaflet.popup().setContent(
+                leaflet.marker(elem.coords, {icon: defaultMarker}).addTo(chatMarkerGroup).bindPopup(leaflet.popup().setContent(
                     `<div>
                         <p style="font-style: italic; font-size: .8rem"> ${elem.msg} </p>
                         <p style="margin: -17px 0; float: right; font-style: italic; font-size: .6rem; color: #797979;"> ${elem.time} </p>
@@ -182,6 +180,23 @@
         })
 
         map.setView(viewCoords, 12);
+    }
+
+    // show active users
+    const handleShowActiveUsers=()=>{
+        showActiveUsers=!showActiveUsers;
+
+        if(showActiveUsers){
+            map.removeLayer(activeMarkerGroup);
+            activeMarkerGroup=leaflet.layerGroup().addTo(map);
+
+            activeUsers.forEach(elem=>{
+                leaflet.marker(elem.uid.split("*"), {icon: activeMarker}).addTo(activeMarkerGroup)
+            })
+        }
+        else{
+            map.removeLayer(activeMarkerGroup);
+        }
     }
 
     // show me
@@ -194,8 +209,12 @@
             if(!showMyLocation) return;
             
             myLocation=leaflet.layerGroup().addTo(map);
-            leaflet.marker(userCoords).addTo(myLocation);
-            map.setView(userCoords, 12);
+            leaflet.marker(userCoords, {icon: activeMarker}).addTo(myLocation).bindPopup(leaflet.popup().setContent(
+                `<div>
+                    <p style="font-style: italic; font-size: .8rem"> You are here </p>
+                </div>`
+            )).openPopup();
+            map.setView(userCoords, 13);
         }
     }
 
@@ -264,8 +283,24 @@
             position: 'bottomright'
         }).addTo(map);
 
-        markerGroup=leaflet.layerGroup().addTo(map);
+        chatMarkerGroup=leaflet.layerGroup().addTo(map);
+        activeMarkerGroup=leaflet.layerGroup().addTo(map);
         myLocation=leaflet.layerGroup().addTo(map);
+        
+        defaultMarker = leaflet.divIcon({
+            className: 'custom-div-icon',
+            html: "<div class='default-marker-outer'><div class='default-marker'></div></div>",
+            iconSize: [20, 20],
+            iconAnchor: [10, 20],
+            popupAnchor: [5, -7.5]
+        });
+        activeMarker = leaflet.divIcon({
+            className: 'custom-div-icon',
+            html: "<div class='active-marker-outer anim'><div class='active-marker'></div></div>",
+            iconSize: [20, 20],
+            iconAnchor: [10, 20],
+            popupAnchor: [5, -7.5]
+        });
 
         mapLoaded=true;
     })
@@ -295,6 +330,8 @@
     <div on:click={handleWhatInfo} class={showWhatInfo? 'what anim': 'what'} title="what">
         <i class="fa-solid fa-question"></i>
     </div>
+
+    <div on:click={handleShowActiveUsers} class={showActiveUsers? 'show-active anim': 'show-active'}>Show active users</div>
     
 
     <div class="chat">
