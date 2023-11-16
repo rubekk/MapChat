@@ -22,7 +22,7 @@ body{
     z-index: 2;
 }
 
-.title, .show-me, .active, .show-active, .what, .chat, .what-info{
+.title, .show-me, .active, .show-active, .what, .chat, .what-info, .tile-layer{
     z-index: 4;
     position: absolute;
 }
@@ -41,7 +41,7 @@ body{
     font-weight: bold;
     float: right;
 }
-.active, .show-active, .show-me, .what{
+.active, .show-active, .show-me, .what, .tile-layer{
     padding: .4rem .6rem;
     color: #fff;
     background-color: rgb(76, 192, 76);
@@ -71,6 +71,10 @@ body{
     align-items: center;
     top: 8.5rem;
     right: 1rem;
+}
+.tile-layer{
+    right: .7rem;
+    bottom: 6.25rem;
 }
 
 .chat{

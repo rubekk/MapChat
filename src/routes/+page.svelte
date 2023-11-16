@@ -19,7 +19,9 @@
         msg="",
         errorMsg="",
         userId="",
-        activeUsers=0;
+        activeUsers=0,
+        tileLayer="default";
+
     let showMyLocation=false,
         showWhatInfo=false,
         showActiveUsers=false,
@@ -27,9 +29,10 @@
         increasedUsers=false,
         showMsg=false,
         showError=false;
+        
     let userCoords=[],
         activeUsersCoords=[],
-        defaultViewCoords=['27.665', '85.331'],
+        defaultViewCoords=['27.7172', '85.3240'],
         markers=[],
         chatData=[],
         days=[];
@@ -38,12 +41,15 @@
     const getLocation=()=>{
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                position=> userCoords= [ position.coords.latitude.toFixed(3), position.coords.longitude.toFixed(3) ],
+                position=> {
+                    userCoords= [ position.coords.latitude.toFixed(4), position.coords.longitude.toFixed(4) ]
+                    console.log([ position.coords.latitude, position.coords.longitude ])
+                },
                 ()=> {
                     errorMsg="Sorry! your location couldn't be tracked. Your location will be set to a random location. Please use different device / browser for exact location.";
                     showError=true;
 
-                    userCoords=['27.555','28.555']
+                    userCoords=['27.7172', '85.3240']
 
                     setTimeout(()=> showError=false, 7500);
                 }
@@ -53,12 +59,13 @@
             errorMsg="Sorry! your location couldn't be tracked. Your location will be set to a random location. Please use different device / browser for exact location.";
             showError=true;
 
-            userCoords=['27.555','28.555']
+            userCoords=['27.7172', '85.3240']
 
             setTimeout(()=> showError=false, 7500);
         }
     }
 
+    let ii=0;
     // send message
     const sendMessage=()=>{
         if(msg && userCoords.length>0){
@@ -72,6 +79,11 @@
                 date: `${currentDate.getFullYear()}/${currentDate.getMonth()+1}/${currentDate.getDate()}`,
                 coords: userCoords
             };
+
+            ii++;
+
+            // data.msg=99;
+            // data.coords=['29.1221','46.1221'];
     
             set(newChatRef, data);
 
@@ -109,7 +121,8 @@
         let includeIndex=0;
 
         markers.forEach((elem,i)=>{
-            if(elem.coords[0]==chatData[index].coords[0] && elem.coords[1]==chatData[index].coords[1]) {
+            // if(elem.coords[0]==chatData[index].coords[0] && elem.coords[1]==chatData[index].coords[1]) {
+            if(elem.coords[0].substring(0, elem.coords[0].length-1)==chatData[index].coords[0].substring(0, chatData[index].coords[0].length-1) && elem.coords[1].substring(0, elem.coords[1].length-1)==chatData[index].coords[1].substring(0, chatData[index].coords[1].length-1)) {
                 includes=true;
                 includeIndex=i;
             }
@@ -134,7 +147,8 @@
             let includeIndex=0;
 
             markers.forEach((item,i)=>{
-                if(elem.coords[0]==item.coords[0] && elem.coords[1]==item.coords[1]) {
+                // if(elem.coords[0]==item.coords[0] && elem.coords[1]==item.coords[1]) {
+                if(elem.coords[0].substring(0, elem.coords[0].length-1)==item.coords[0].substring(0, item.coords[0].length-1) && elem.coords[1].substring(0, elem.coords[1].length-1)==item.coords[1].substring(0, item.coords[1].length-1)) {
                     includes=true;
                     includeIndex=i;
                 }
@@ -149,6 +163,8 @@
 
     // show markers
     const showMarkers=(viewCoords=defaultViewCoords, index=-1)=>{
+        if(markers.length==0) return; 
+
         map.removeLayer(chatMarkerGroup);
         chatMarkerGroup=leaflet.layerGroup().addTo(map);
 
@@ -161,7 +177,6 @@
 
         markers.forEach((elem,i)=>{
             if(index==i){
-                
                 leaflet.marker(elem.coords, {icon: defaultMarker}).addTo(chatMarkerGroup).bindPopup(leaflet.popup().setContent(
                     `<div>
                         <p style="font-style: italic; font-size: .8rem"> ${elem.msg} </p>
@@ -250,6 +265,38 @@
             ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
     }
 
+    // check if chat user is active or not
+    const checkActiveChat=coords=>{
+        if(activeUsersCoords.length==0) return false;
+
+        let isActive=false;
+
+        activeUsersCoords.forEach(elem=>{
+            let elemArr=elem.split("*");
+
+            if(elemArr[0].substring(0, elemArr[0].length-1)==coords[0].substring(0, coords[0].length-1) && elemArr[1].substring(0, elemArr[1].length-1)==coords[1].substring(0, coords[1].length-1)) isActive=true;
+        })
+
+        return isActive;
+    }
+
+    // change tile layer
+    const handleTileLayer=()=>{
+        if(tileLayer=="default"){
+            tileLayer="satellite";
+
+            leaflet.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3']
+            }).addTo(map);
+        }
+        else{
+            tileLayer="default";
+
+            leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        }
+    }
+
     // keep upto date with all chat messages from firebase
     onValue(ref(db, "chat"), (snapshot) => {
         if(snapshot.val()){
@@ -276,7 +323,6 @@
         leaflet= await import("leaflet");
 
         map = leaflet.map('map', { zoomControl: false }).setView(defaultViewCoords, 12);
-
         leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         leaflet.control.zoom({
@@ -320,18 +366,22 @@
         <br>
         <span class="sub-title">नक्शा मा कुरा</span>
     </div>
-    
+
+    <div class="active">Active users: {activeUsers? activeUsers.length: 0}</div>
+
+    <div on:click={handleShowActiveUsers} class={showActiveUsers? 'show-active anim': 'show-active'}>Show active users</div>
+
     <div on:click={showMe} class={showMyLocation? 'show-me anim': 'show-me'} title="locate me">
         <i class="fa-solid fa-location-dot"></i>
     </div>
-    
-    <div class="active">Active users: {activeUsers?activeUsers.length:0}</div>
 
     <div on:click={handleWhatInfo} class={showWhatInfo? 'what anim': 'what'} title="what">
         <i class="fa-solid fa-question"></i>
     </div>
 
-    <div on:click={handleShowActiveUsers} class={showActiveUsers? 'show-active anim': 'show-active'}>Show active users</div>
+    <div on:click={handleTileLayer} class="tile-layer">
+        <i class="fa-solid fa-repeat"></i>
+    </div>
     
 
     <div class="chat">
@@ -342,8 +392,8 @@
                 {#if handleMessageDate(data.date)}
                     <p class="msg-date">{getDayOfWeek(data.date)} {data.date}</p>
                 {/if}
-                <div on:click={()=>handleMessageClick(index)} class={data.coords[0]==userCoords[0] && data.coords[1]==userCoords[1]? 'ind-message right-side':'ind-message'}>
-                    <i class="fa-solid fa-chevron-right"></i>
+                <div on:click={()=>handleMessageClick(index)} class={userCoords.length>0 && data.coords[0].substring(0, data.coords[0].length-1)==userCoords[0].substring(0, userCoords[0].length-1) && data.coords[1].substring(0, data.coords[1].length-1)==userCoords[1].substring(0, userCoords[1].length-1)? 'ind-message right-side': 'ind-message'}>
+                    <i class="fa-solid fa-chevron-right" title={checkActiveChat(data.coords)?"online":"offline"}></i>
                     <div class="msg">{data.msg}</div>
                     <div class="time">{data.time}</div>
                 </div>
