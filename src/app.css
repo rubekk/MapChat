@@ -187,6 +187,26 @@ body{
     right: .5rem;
 }
 
+.default-marker-outer, .active-marker-outer{
+    height: 30px;
+    width: 30px;
+    background-color: rgba(0, 0, 0, .4);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 193;
+}
+.default-marker, .active-marker{
+    width: 20px;
+    height: 20px;
+    background-color: #2a73f4;
+    border: 2px solid rgb(76, 192, 76);
+    border-radius: 50%;
+    z-index: 193;
+}
+
+
 .anim{
     background: linear-gradient(-45deg, rgb(76,192,76), #2a73f4, rgb(0, 255, 0), #83aaee);
     background-size: 400% 400%;
@@ -250,23 +270,4 @@ body{
     .message{
         padding: .5rem;
     }
-}
-
-.default-marker-outer, .active-marker-outer{
-    height: 30px;
-    width: 30px;
-    background-color: rgba(0, 0, 0, .4);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 193;
-}
-.default-marker, .active-marker{
-    width: 20px;
-    height: 20px;
-    background-color: #2a73f4;
-    border: 2px solid rgb(76, 192, 76);
-    border-radius: 50%;
-    z-index: 193;
 }
