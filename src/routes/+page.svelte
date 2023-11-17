@@ -371,7 +371,7 @@
     <div class="title">
         <span class="title-map">Map</span><span class="title-chat">Chat</span>
         <br>
-        <span class="sub-title">नक्शा मा कुरा</span>
+        <span class="sub-title">अब नक्शा मा कुरा</span>
     </div>
 
     <div class="active">Active users: {activeUsers? activeUsers.length: 0}</div>
