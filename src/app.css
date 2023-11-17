@@ -234,7 +234,7 @@ body{
     .title, .chat{
         left: .5rem;
     }
-    .active, .show-me, .what{
+    .active, .show-active, .show-me, .what{
         right: .5rem;
     }
 }
