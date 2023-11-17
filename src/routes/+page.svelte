@@ -11,6 +11,7 @@
 
     let leaflet,
         map,
+        tile,
         chatMarkerGroup,
         activeMarkerGroup,
         myLocation,
@@ -68,7 +69,7 @@
 
     // send message
     const sendMessage=()=>{
-        if(msg && userCoords.length>0){
+        if(msg.length>1 && userCoords.length>0){
             const chatListRef = ref(db, 'chat');
             const newChatRef = push(chatListRef);
             
@@ -203,7 +204,7 @@
             activeMarkerGroup=leaflet.layerGroup().addTo(map);
 
             activeUsersCoords.forEach(elem=>{
-                leaflet.marker(elem.split("*"), {icon: activeMarker}).addTo(activeMarkerGroup)
+                if(elem.indexOf("*")>0) leaflet.marker(elem.split("*"), {icon: activeMarker}).addTo(activeMarkerGroup)
             })
         }
         else{
@@ -271,9 +272,12 @@
         let isActive=false;
 
         activeUsersCoords.forEach(elem=>{
-            let elemArr=elem.split("*");
+            if(elem.indexOf("*")>0){
 
-            if(elemArr[0].substring(0, elemArr[0].length-1)==coords[0].substring(0, coords[0].length-1) && elemArr[1].substring(0, elemArr[1].length-1)==coords[1].substring(0, coords[1].length-1)) isActive=true;
+                let elemArr=elem.split("*");
+                
+                if(elemArr[0].substring(0, elemArr[0].length-1)==coords[0].substring(0, coords[0].length-1) && elemArr[1].substring(0, elemArr[1].length-1)==coords[1].substring(0, coords[1].length-1)) isActive=true;
+            }
         })
 
         return isActive;
@@ -281,10 +285,12 @@
 
     // change tile layer
     const handleTileLayer=()=>{
+        map.removeLayer(tile);
+        
         if(tileLayer=="default"){
             tileLayer="satellite";
 
-            leaflet.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            tile=leaflet.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
                 maxZoom: 20,
                 subdomains:['mt0','mt1','mt2','mt3']
             }).addTo(map);
@@ -292,7 +298,7 @@
         else{
             tileLayer="default";
 
-            leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            tile=leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         }
     }
 
@@ -322,7 +328,9 @@
         leaflet= await import("leaflet");
 
         map = leaflet.map('map', { zoomControl: false }).setView(defaultViewCoords, 12);
-        leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        tile=leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // map.removeLayer(tile);
 
         leaflet.control.zoom({
             position: 'bottomright'
