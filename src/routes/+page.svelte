@@ -4,6 +4,7 @@
 	import { getDatabase, ref, set, push, onValue, onDisconnect, child } from "firebase/database";
     import { firebaseConfig } from "$lib/firebaseConfig";
     import "./../app.css";
+    import messageSound from "$lib/message.mp3";
 
     const firebaseApp=initializeApp(firebaseConfig);
     const db=getDatabase();
@@ -16,6 +17,7 @@
         msgDiv, 
         defaultMarker,
         activeMarker,
+        audio,
         msg="",
         errorMsg="",
         userId="",
@@ -81,6 +83,8 @@
             set(newChatRef, data);
 
             msg="";
+
+            audio.play();
         }
         else if(userCoords.length==0) getLocation();
     }
@@ -243,7 +247,9 @@
 
         showMsg=!showMsg;
 
-        if(showMsg && msgDiv) msgDiv.scrollTop = msgDiv.scrollHeight;
+        setTimeout(()=>{
+            if(showMsg && msgDiv) msgDiv.scrollTop = msgDiv.scrollHeight;
+        }, 100)
     }
 
     // handle show what info
@@ -412,4 +418,6 @@
         {errorMsg}
     </div>
     {/if}
+
+    <audio bind:this={audio} src={messageSound}></audio>
 </div>
